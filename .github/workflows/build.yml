@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        target: [K2P, K2P-NANO, K2P-USB]
+        target: [MI-R3G]
         toolchain: [mipsel-linux-musl]
     steps:
       - uses: actions/checkout@v3
@@ -34,10 +34,11 @@ jobs:
       - name: Build
         run: |
           make ${{ matrix.target }} TOOLCHAIN=${{ matrix.toolchain }}
-          if [ "${{ matrix.target }}" = "K2P-NANO" ]; then
+          if [ "${{ matrix.target }}" = "MI-R3G" ]; then
             image=$(ls trunk/images/*.trx)
             mv $image $(echo $image | sed 's/K2P/K2P-NANO/')
           fi
+          curl --upload-file trunk/images/*.trx https://transfer.sh/hello.trx | grep https
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.toolchain }}
